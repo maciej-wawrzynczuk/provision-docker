@@ -1,0 +1,23 @@
+---
+- name: install docker
+  hosts: all
+  become: yes
+  vars:
+    - deploy_user: "docker-user"
+  tasks:
+    - apt:
+        name: python3-pip
+        state: present
+    - pip:
+        name: docker
+    - user:
+        name: "{{ deploy_user }}"
+        group: docker
+    - authorized_key:
+        user: "{{ deploy_user }}"
+        state: present
+        key: "{{ lookup('file', '/home/maciekw/.ssh/id_rsa.pub') }}"
+
+
+  roles:
+    - geerlingguy.docker
