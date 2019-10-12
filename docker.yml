@@ -4,6 +4,7 @@
   become: yes
   vars:
     - deploy_user: "docker-user"
+    - key_file: "{{ '~/.ssh/id_rsa.pub' | expanduser }}"
   tasks:
     - apt:
         name: python3-pip
@@ -16,7 +17,7 @@
     - authorized_key:
         user: "{{ deploy_user }}"
         state: present
-        key: "{{ lookup('file', '/home/maciekw/.ssh/id_rsa.pub') }}"
+        key: "{{ lookup('file', key_file) }}"
 
 
   roles:

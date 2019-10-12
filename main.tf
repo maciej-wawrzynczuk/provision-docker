@@ -1,5 +1,5 @@
 # modules:
-# use git::git@github.com:maciej-wawrzynczuk/terraform-lib.git//
+# use git::git@github.com:maciej-wawrzynczuk/terraform-lib.git//ssh-key?ref=v1
 # for stable or
 # ../terrafrom-lib/ (or wherever you clone it)
 # for devel
@@ -12,21 +12,21 @@ provider "aws" {
 }
 
 module "key" {
-  source = "../terraform-lib/ssh-key"
+  source = "git::git@github.com:maciej-wawrzynczuk/terraform-lib.git//ssh-key?ref=v1"
   project = "${var.project}"
 }
 
 module "vpc" {
-  source = "../terraform-lib/vpc"
+  source = "git::git@github.com:maciej-wawrzynczuk/terraform-lib.git//vpc?ref=v1"
   project = "${var.project}"
 }
 
 module "xenial" {
-  source = "../terraform-lib/xenial"
+  source = "git::git@github.com:maciej-wawrzynczuk/terraform-lib.git//xenial?ref=v1"
 }
 
 module "host" {
-  source = "../terraform-lib/host"
+  source = "git::git@github.com:maciej-wawrzynczuk/terraform-lib.git//host?ref=v1"
   ami_id = "${module.xenial.id}"
   project = "${var.project}"
   subnet_id = "${module.vpc.subnet_id}"
@@ -36,7 +36,7 @@ module "host" {
 }
 
 module "dns" {
-  source = "../terraform-lib/dns"
+  source = "git::git@github.com:maciej-wawrzynczuk/terraform-lib.git//dns?ref=v1"
   domain = "lamamind.com."
   hostnames = ["docker"]
   addresses = "${module.host.ips}"
@@ -44,7 +44,9 @@ module "dns" {
 }
 
 module "provision" {
-  source = "../terraform-lib/provision"
+  source = "git::git@github.com:maciej-wawrzynczuk/terraform-lib.git//provision?ref=v1"
+  #  trigger = "${timestamp()}"
+  trigger = "${join("," , module.host.ids)}"
   hosts = "${module.host.ips}"
   playbook = "docker.yml"
 }
